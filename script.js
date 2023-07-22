@@ -1,9 +1,15 @@
 var switchElement = document.getElementById('switch');
 var isOn = false;
-var colors = ['red', 'green', 'blue','pink','purple','yellow','sky','orange'];
-var currentColor = 0;
+var intervalId;
+var currentPattern = 0;
+var patterns = [
+  { speed: 800, blackout: false },
+  { speed: 400, blackout: false },
+  { speed: 200, blackout: false },
+  { speed: 0, blackout: true }
+];
 
-switchElement.addEventListener('click', function() {
+switchElement.addEventListener('click', function () {
   isOn = !isOn;
   switchElement.classList.toggle('on');
 
@@ -15,16 +21,27 @@ switchElement.addEventListener('click', function() {
 });
 
 function startDiscoLight() {
-  currentColor = 0;
-  document.body.style.backgroundColor = colors[currentColor];
-  setInterval(changeColor, 500);
+  currentPattern = 0;
+  intervalId = setInterval(changeColor, patterns[currentPattern].speed);
 }
 
 function changeColor() {
-  currentColor = (currentColor + 1) % colors.length;
-  document.body.style.backgroundColor = colors[currentColor];
+  document.body.style.backgroundColor = patterns[currentPattern].blackout ? 'black' : getRandomColor();
+  currentPattern = (currentPattern + 1) % patterns.length;
+  clearInterval(intervalId);
+  intervalId = setInterval(changeColor, patterns[currentPattern].speed);
 }
 
 function stopDiscoLight() {
-  clearInterval(changeColor);
+  clearInterval(intervalId);
+  document.body.style.backgroundColor = 'black';
+}
+
+function getRandomColor() {
+  var letters = '0123456789ABCDEF';
+  var color = '#';
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
 }
